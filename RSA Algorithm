@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <math.h>
+uint64_t gcd(uint64_t a, uint64_t b) {
+    if (b == 0)
+        return a;
+    return gcd(b, a % b);
+}
+
+ 
+void generate_keys(uint64_t p, uint64_t q, uint64_t *n, uint64_t *e, uint64_t *d) {
+    *n = p * q;
+    uint64_t phi = (p - 1) * (q - 1);
+
+ 
+    *e = 2;
+    while (gcd(*e, phi) != 1) {
+        (*e)++;
+    }
+
+ 
+    uint64_t k = 1;
+    while (((k * phi) + 1) % *e != 0) {
+        k++;
+    }
+    *d = ((k * phi) + 1) / *e;
+}
+
+ 
+uint64_t mod_exp(uint64_t base, uint64_t exponent, uint64_t modulus) {
+    uint64_t result = 1;
+    base = base % modulus;
+    while (exponent > 0) {
+        if (exponent % 2 == 1) {
+            result = (result * base) % modulus;
+        }
+        exponent = exponent >> 1;
+        base = (base * base) % modulus;
+    }
+    return result;
+}
+
+ 
+uint64_t encrypt(uint64_t plaintext, uint64_t e, uint64_t n) {
+    return mod_exp(plaintext, e, n);
+}
+
+ 
+uint64_t decrypt(uint64_t ciphertext, uint64_t d, uint64_t n) {
+    return mod_exp(ciphertext, d, n);
+}
+
+int main() {
+    uint64_t p = 61;  
+    uint64_t q = 53;  
+    uint64_t n, e, d;  
+    uint64_t plaintext = 65; 
+    uint64_t ciphertext;
+
+ 
+    generate_keys(p, q, &n, &e, &d);
+
+     
+    ciphertext = encrypt(plaintext, e, n);
+    printf("Encrypted ciphertext: %llu\n", ciphertext);
+
+ 
+    uint64_t decrypted_text = decrypt(ciphertext, d, n);
+    printf("Decrypted plaintext: %llu\n", decrypted_text);
+
+    return 0;
+}
