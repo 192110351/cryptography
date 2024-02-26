@@ -1,0 +1,48 @@
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <math.h>
+
+uint64_t mod_exp(uint64_t base, uint64_t exponent, uint64_t modulus) {
+    uint64_t result = 1;
+    base = base % modulus;
+    while (exponent > 0) {
+        if (exponent % 2 == 1) {
+            result = (result * base) % modulus;
+        }
+        exponent = exponent >> 1;
+        base = (base * base) % modulus;
+    }
+    return result;
+}
+
+
+void diffie_hellman(uint64_t p, uint64_t g, uint64_t a, uint64_t b) {
+
+    uint64_t A = mod_exp(g, a, p);
+    uint64_t B = mod_exp(g, b, p);
+
+    uint64_t secret_a = mod_exp(B, a, p);
+    uint64_t secret_b = mod_exp(A, b, p);
+
+    if (secret_a == secret_b) {
+        printf("Shared secret: %llu\n", secret_a);
+    } else {
+        printf("Error: Shared secrets do not match!\n");
+    }
+}
+
+int main() {
+    uint64_t p = 23;  
+    uint64_t g = 5;  
+    uint64_t a = 6;  
+    uint64_t b = 15; 
+
+    
+    diffie_hellman(p, g, a, b);
+
+    return 0;
+}
+S
+
+SS
